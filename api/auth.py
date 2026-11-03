@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Header
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials 
 from database import get_db
 from pydantic import BaseModel
 from sqlalchemy import text, Connection
@@ -84,14 +85,13 @@ def login(payload: AccountBody, db_connection: Connection = Depends(get_db)):
     return {"session_token": session_token, "token_type": "bearer", "user_id": existing_user.id}
 
 
+def verify_session_token(user_id: int, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()), db_connection: Connection = Depends(get_db)):
 
-def verify_session_token(user_id: int, authorization: str = Header(alias="Authorization"), db_connection: Connection = Depends(get_db)):
-
-    if not authorization or not authorization.startswith("Bearer "):
+    if not credentials or credentials.scheme != "Bearer":
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
                             detail = "Missing or Invalid Authorization header") 
 
-    session_token = authorization.split(" ")[1]
+    session_token = credentials.credentials
     query = text("SELECT session_token, token_timestamp FROM users WHERE id = :id")
     token_details = db_connection.execute(query, {"id": user_id}).first()
 
