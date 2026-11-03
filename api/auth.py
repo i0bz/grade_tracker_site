@@ -6,7 +6,7 @@ import secrets
 import hashlib
 from datetime import datetime,timedelta, timezone
 
-auth_router = APIRouter()
+auth_router = APIRouter(prefix="/auth")
 
 MAX_TOKEN_LIFE = 12
 
