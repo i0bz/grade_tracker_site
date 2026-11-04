@@ -17,3 +17,4 @@ def logout(user_id: int, _ = Depends(verify_session_token), db_connection: Conne
         db_connection.rollback()
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail = str(e))
+
