@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials 
 from database import get_db
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from sqlalchemy import text, Connection
 import secrets
 import hashlib
@@ -17,6 +17,12 @@ class AccountBody(BaseModel):
     username: str
     password: str
 
+    @model_validator(mode="after")
+    def check_name_length(self):
+        if len(self.username) > 50:
+            raise ValueError("Username cannot be longer than 50 characters")
+
+
 
 
 @auth_router.post("/register")
@@ -26,7 +32,7 @@ def register(payload: AccountBody, db_connection: Connection = Depends(get_db)):
 
     if existing_user:
         raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 detail="Username already taken"
             )
 
@@ -96,7 +102,7 @@ def verify_session_token(user_id: int, credentials: HTTPAuthorizationCredentials
     token_details = db_connection.execute(query, {"id": user_id}).first()
 
     if not token_details:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = f"User with id \"{user_id}\" does not exist")
 
 
