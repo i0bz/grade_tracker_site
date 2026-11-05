@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from decimal import Decimal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from .auth import verify_session_token
 from sqlalchemy import Connection, text
 from database import get_db
@@ -11,6 +11,12 @@ class UserSubjectUpdateBody(BaseModel):
     activity_split: Decimal = Field(max_digits=5, decimal_places=2)
     major_exam_split: Decimal = Field(max_digits=5, decimal_places=2)
     final_output_split: Decimal = Field(max_digits=5, decimal_places=2)
+
+    @model_validator(mode="after")
+    def validate_splits(self):
+        if (self.activity_split + self.major_exam_split + self.final_output_split) != Decimal('1.00'):
+            raise ValueError("Splits must equate to 100%")
+        return self
 
 class UserSubjectAddBody(UserSubjectUpdateBody):
     subject_code: str
@@ -29,13 +35,11 @@ def add_user_subject(user_id: int, payload: UserSubjectAddBody, db_connection: C
                         VALUES (:user_id, :subject_code, :activity_split, :major_exam_split, :final_output_split)""")
         query_parameters = payload.model_dump()
         
-        
         db_connection.execute(query, query_parameters)
         db_connection.commit()
     except Exception as e:
         db_connection.rollback()
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
-                            detail = str(e))
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
     return {"message": "Subject created successfully"}
 
 
@@ -61,12 +65,15 @@ def update_user_subject(user_id: int, subject_code: str, payload: UserSubjectUpd
                         WHERE user_id = :user_id AND subject_code = :subject_code""")
         query_parameters |= payload.model_dump()
         
-        db_connection.execute(query, query_parameters)
+        result = db_connection.execute(query, query_parameters)
         db_connection.commit()
+
+        if (result.rowcount == 0):
+            raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
+
     except Exception as e:
         db_connection.rollback()
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
-                            detail = str(e))
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @user_subjects_router.delete("/{subject_code}")
 def delete_user_subject(user_id: int, subject_code: str, db_connection: Connection = Depends(get_db), _ = Depends(verify_session_token)):
@@ -77,5 +84,4 @@ def delete_user_subject(user_id: int, subject_code: str, db_connection: Connecti
         db_connection.commit()
     except Exception as e:
         db_connection.rollback()
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
-                            detail = str(e))
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
