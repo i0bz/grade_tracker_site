@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from decimal import Decimal
 from pydantic import BaseModel, Field, model_validator
+from typing import Optional
 from .auth import verify_session_token
 from sqlalchemy import Connection, text
 from database import get_db
 
 user_subjects_router = APIRouter(prefix = "/subjects")
 
-class UserSubjectUpdateBody(BaseModel):
+class UserSubjectBody(BaseModel):
+    subject_code: str
     activity_split: Decimal = Field(max_digits=5, decimal_places=2)
     major_exam_split: Decimal = Field(max_digits=5, decimal_places=2)
     final_output_split: Decimal = Field(max_digits=5, decimal_places=2)
@@ -18,17 +20,17 @@ class UserSubjectUpdateBody(BaseModel):
             raise ValueError("Splits must equate to 100%")
         return self
 
-class UserSubjectAddBody(UserSubjectUpdateBody):
-    subject_code: str
+class UserSubjectUpdateBody(UserSubjectBody):
+    subject_code: Optional[str] = None
 
 
-class SubjectResponse(UserSubjectAddBody):
+class SubjectResponse(UserSubjectBody):
     subject_name: str
     units: int
 
 
 @user_subjects_router.post("/")
-def add_user_subject(user_id: int, payload: UserSubjectAddBody, db_connection: Connection = Depends(get_db), _ = Depends(verify_session_token)):
+def add_user_subject(user_id: int, payload: UserSubjectBody, db_connection: Connection = Depends(get_db), _ = Depends(verify_session_token)):
     query_parameters = {"user_id": user_id}
     try:
         query = text("""INSERT INTO user_subjects (user_id, subject_code, activity_split, major_exam_split, final_output_split)

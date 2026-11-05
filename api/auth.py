@@ -21,6 +21,7 @@ class AccountBody(BaseModel):
     def check_name_length(self):
         if len(self.username) > 50:
             raise ValueError("Username cannot be longer than 50 characters")
+        return self
 
 
 
