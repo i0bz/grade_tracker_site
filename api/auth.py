@@ -3,9 +3,10 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from database import get_db
 from pydantic import BaseModel, model_validator
 from sqlalchemy import text, Connection
+from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime,timedelta, timezone
 import secrets
 import hashlib
-from datetime import datetime,timedelta, timezone
 
 auth_router = APIRouter(prefix="/auth")
 
@@ -47,12 +48,10 @@ def register(payload: AccountBody, db_connection: Connection = Depends(get_db)):
                                         })
         db_connection.commit()
         
-    except Exception as e:
+    except SQLAlchemyError as e:
         db_connection.rollback()
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         
     return {"message": "User registered successfully"}
@@ -82,12 +81,10 @@ def login(payload: AccountBody, db_connection: Connection = Depends(get_db)):
                                       "token_timestamp": token_timestamp,
                                       "id": existing_user.id})
         db_connection.commit()
-    except Exception as e:
+    except SQLAlchemyError as e:
         db_connection.rollback()
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return {"session_token": session_token, "token_type": "bearer", "user_id": existing_user.id}
 

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, model_validator
 from .auth import verify_session_token
 from sqlalchemy import Connection, text
+from sqlalchemy.exc import SQLAlchemyError
 from database import get_db
 
 activities_router = APIRouter(prefix="/activities")
@@ -13,15 +14,21 @@ class ActivityBody(BaseModel):
     max_points: int
 
     @model_validator(mode="after")
-    def check_enum(self):
+    def validate_enum(self):
         if self.activity_type != "Activity" and self.activity_type != "Major Exam" and self.activity_type != "Final Output":
             raise ValueError("Invalid activity type")
         return self
 
     @model_validator(mode="after")
-    def check_points_overflow(self):
+    def validate_points_overflow(self):
         if self.points > self.max_points:
             raise ValueError("Points must be lesser than max points")
+        return self
+
+    @model_validator(mode="after")
+    def validate_string_length(self):
+        if len(self.activity_name) > 50:
+            raise ValueError("Name must be less than 50 characters")
         return self
 
 
@@ -45,9 +52,8 @@ def add_activity(user_id: int, subject_code: str, payload: ActivityBody, _ = Dep
 
         db_connection.execute(query, query_parameters)
         db_connection.commit()
-    except Exception as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
-                            detail = str(e))
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
 
     return {"message": "Activity added successfully"}
 
@@ -65,7 +71,7 @@ def get_activities(user_id: int, subject_code: str, _ = Depends(verify_session_t
 
     query = text("SELECT * FROM activities WHERE user_id = :user_id AND subject_code = :subject_code")
 
-    return db_connection.execute(query, {"user_id": user_id, "subject_code": subject_code}).mappings().all()
+    return db_connection.execute(query, query_parameters).mappings().all()
 
 
 @activities_router.put("/{activity_id}")
@@ -76,11 +82,14 @@ def update_activity(user_id: int, subject_code: str, activity_id: int, payload: 
                         WHERE id = :id AND user_id = :user_id AND subject_code = :subject_code""")
         query_parameters |= payload.model_dump()
 
-        db_connection.execute(query, query_parameters)
+        result = db_connection.execute(query, query_parameters)
         db_connection.commit()
-    except Exception as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
-                            detail = str(e))
+
+        if result.rowcount == 0:
+            raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
+
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -92,7 +101,7 @@ def delete_activity(user_id: int, subject_code: str, activity_id: int, db_connec
         query_parameters = {"id": activity_id, "user_id": user_id, "subject_code": subject_code}
         db_connection.execute(query, query_parameters)
         db_connection.commit()
-    except Exception as e:
+
+    except SQLAlchemyError as e:
         db_connection.rollback()
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
-                            detail = str(e))
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)

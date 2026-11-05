@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, model_validator
 from typing import Optional
 from .auth import verify_session_token
 from sqlalchemy import Connection, text
+from sqlalchemy.exc import SQLAlchemyError
 from database import get_db
 
 user_subjects_router = APIRouter(prefix = "/subjects")
@@ -35,11 +36,11 @@ def add_user_subject(user_id: int, payload: UserSubjectBody, db_connection: Conn
     try:
         query = text("""INSERT INTO user_subjects (user_id, subject_code, activity_split, major_exam_split, final_output_split)
                         VALUES (:user_id, :subject_code, :activity_split, :major_exam_split, :final_output_split)""")
-        query_parameters = payload.model_dump()
+        query_parameters |= payload.model_dump()
         
         db_connection.execute(query, query_parameters)
         db_connection.commit()
-    except Exception as e:
+    except SQLAlchemyError as e:
         db_connection.rollback()
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
     return {"message": "Subject created successfully"}
@@ -61,11 +62,11 @@ def get_user_subjects(user_id: int, db_connection: Connection = Depends(get_db),
 
 @user_subjects_router.put("/{subject_code}")
 def update_user_subject(user_id: int, subject_code: str, payload: UserSubjectUpdateBody, db_connection: Connection = Depends(get_db), _ = Depends(verify_session_token)):
-    query_parameters = {"user_id": user_id, "subject_code": subject_code}
     try:
         query = text("""UPDATE user_subjects SET activity_split = :activity_split, major_exam_split = :major_exam_split, final_output_split = :final_output_split
                         WHERE user_id = :user_id AND subject_code = :subject_code""")
-        query_parameters |= payload.model_dump()
+        query_parameters = payload.model_dump()
+        query_parameters |= {"user_id": user_id, "subject_code": subject_code}
         
         result = db_connection.execute(query, query_parameters)
         db_connection.commit()
@@ -73,7 +74,7 @@ def update_user_subject(user_id: int, subject_code: str, payload: UserSubjectUpd
         if (result.rowcount == 0):
             raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
 
-    except Exception as e:
+    except SQLAlchemyError as e:
         db_connection.rollback()
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -84,6 +85,6 @@ def delete_user_subject(user_id: int, subject_code: str, db_connection: Connecti
         query_parameters = {"user_id": user_id, "subject_code": subject_code}
         db_connection.execute(query, query_parameters)
         db_connection.commit()
-    except Exception as e:
+    except SQLAlchemyError as e:
         db_connection.rollback()
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR)
