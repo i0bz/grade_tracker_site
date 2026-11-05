@@ -16,7 +16,7 @@ class UserSubjectBody(BaseModel):
 
     @model_validator(mode="after")
     def validate_splits(self):
-        if (self.activity_split + self.major_exam_split + self.final_output_split) != Decimal('1.00'):
+        if (self.activity_split + self.major_exam_split + self.final_output_split) != Decimal('100.00'):
             raise ValueError("Splits must equate to 100%")
         return self
 
