@@ -15,7 +15,7 @@ register_form?.addEventListener('submit', async (event: SubmitEvent) =>
 
     try
     {
-        const response = await fetch('/api/v1/register', post_payload(register_payload));
+        const response = await fetch('/api/v1/auth/register', post_payload(register_payload));
 
         if (response.ok)
         {
