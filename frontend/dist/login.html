@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <p>Test</p>
+    <div class="container">
+        <h2>Grade Tracker</h2>
+        <div class="auth-layout">
+            <section class="panel">
+                <h3>Login</h3>
+                <form id="login_form">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" type="text">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password">
+                    
+                    <button class="btn btn-primary" type="submit">Sign in</button>
+                </form>
+                <div class="message-error" id="error-div"></div>
+            </section>
+            <section class="panel">
+                <h3>Create account</h3>
+                <div class="link-row">
+                    <span>Need an account?</span>
+                    <a href="/register">Register</a>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script src="js/login.js" type="module"></script>
 </body>
 </html>

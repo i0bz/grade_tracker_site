@@ -21,3 +21,16 @@ async def serve_index():
 @app.get("/login")
 async def serve_login():
     return FileResponse(os.path.join(html_path, "login.html"))
+
+@app.get("/dashboard")
+async def serve_dashboard():
+    return FileResponse(os.path.join(html_path, "dashboard.html"))
+
+@app.get("/register")
+async def serve_register():
+    return FileResponse(os.path.join(html_path, "register.html"))
+
+
+@app.get("/logout")
+async def logout_page():
+    return FileResponse(os.path.join(html_path, "logout.html"))

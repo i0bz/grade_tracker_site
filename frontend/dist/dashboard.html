@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <h1 class="headline"></h1>
+            <div class="link-row">
+                <a href="/profile">Profile</a>
+                <a href="/Subjects">Subjects</a>
+                <a href="/Activities">Activities</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Subjects</div>
+                <div class="value" id="subject_amount""></div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Average</div>
+                <div class="value" id="gwa"></div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Highest Grade</div>
+                <div class="value" id="highest_grade"></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="panel">
+        <h2>Subjects Overview</h2>
+        <div id="subjects_table">
+            
+        </div>
+    </section>
+
+    <script src="js/dashboard.js" type="module"></script>
+</body>
+</html>
