@@ -91,7 +91,7 @@ def login(payload: AccountBody, db_connection: Connection = Depends(get_db)):
 
 def verify_session_token(user_id: int, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()), db_connection: Connection = Depends(get_db)):
 
-    if not credentials or credentials.scheme != "Bearer":
+    if not credentials or credentials.scheme.lower() != "bearer":
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED,
                             detail = "Missing or Invalid Authorization header") 
 
