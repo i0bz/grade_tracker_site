@@ -31,6 +31,12 @@ class ActivityBody(BaseModel):
             raise ValueError("Name must be less than 50 characters")
         return self
 
+    @model_validator(mode="after")
+    def validate_max_points(self):
+        if self.max_points < 1:
+            raise ValueError("Invalid max points amount")
+        return self
+
 
 class ActivityResponseBody(ActivityBody):
     id: int
