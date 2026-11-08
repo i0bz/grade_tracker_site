@@ -139,9 +139,6 @@ def get_grades(user_id: int, db_connection: Connection = Depends(get_db), _ = De
 
     result = db_connection.execute(query, query_params)
 
-    if (result.rowcount == 0):
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
-                            detail = "User has no subjects enrolled")
 
 
     response_data: list[GradeResponse] = []
