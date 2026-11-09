@@ -27,6 +27,17 @@ export function get_payload()
         }
     };
 }
+export function delete_payload()
+{
+    const session = get_session_info();
+    return {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${session.session_token}`,
+            "Content-Type": "application/json"
+        }
+    };
+}
 
 
 export function post_payload(object: any)

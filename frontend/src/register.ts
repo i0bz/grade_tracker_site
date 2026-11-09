@@ -24,17 +24,21 @@ register_form?.addEventListener('submit', async (event: SubmitEvent) =>
         }
 
         const error_data = await response.json();
-
         switch(response.status)
         {
             case 401:
+                error_div.className = "message error";
                 error_div.textContent = error_data.detail;
+                break;
             case 500:
+                error_div.className = "message error";
                 error_div.textContent = "Server shat itself";
+                break;
+            }
         }
-    }
     catch (e: unknown)
     {
+        error_div.className = "message error";
         error_div.textContent = "Something shat itself";
     }
 });

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subjects</title>
+        <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <h1 class="headline">Grading Schema</h1>
+            <div class="link-row">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/activities">Activities</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="auth-layout">
+            <section class="panel">
+                <h2>Add Subject Schema</h2>
+                <form id="add_subject">
+                    <label for="subject_code">Subject</label>
+                    <select name="subject_code" id="subject_code" required>
+                        <option value="">Select subject</option>
+                    </select>
+                    <label for="activity_split">Activity (%)</label>
+                    <input id="activity_split" name="activity_split" type="number" min="0" max="100" value="30" required>
+    
+                    <label for="major_exam_split">Major Exam (%)</label>
+                    <input id="major_exam_split" name="major_exam_split" type="number" min="0" max="100" value="40" required>
+    
+                    <label for="final_output_split">Final Output (%)</label>
+                    <input id="final_output_split" name="final_output_split" type="number" min="0" max="100" value="30" required>
+    
+                    <button class="btn btn-primary" id="subject_submit" type="submit">Save schema</button>
+                </form>
+                <div id="result_div"></div>
+            </section>
+
+            <section class="panel">
+                <h2>Schema List</h2>
+                <div id="schema_table">
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script src="js/subjects.js" type="module"></script>
+</body>
+</html>
