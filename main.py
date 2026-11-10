@@ -39,3 +39,7 @@ async def logout_link():
 @app.get("/subjects")
 async def subjects_page():
     return FileResponse(os.path.join(html_path, "subjects.html"))
+
+@app.get("/activities")
+async def activities_page():
+    return FileResponse(os.path.join(html_path, "activities.html"))

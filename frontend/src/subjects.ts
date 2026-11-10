@@ -1,33 +1,26 @@
 import { get_session_info, get_payload, delete_payload, post_payload } from "./utils.js";
 
 const session_info = get_session_info();
-const global_subjects_responese = await fetch(`/api/v1/subjects`, get_payload());
-
-
-
 
 type SubjectInfo = 
 {
     subject_code: string,
     subject_name: string,
     units: number,
-}
+};
 
 type SubjectSchema  = SubjectInfo & {
     activity_split: number,
     major_exam_split: number,
     final_output_split: number
-}
-
-
-const global_subjects: SubjectInfo[] = await global_subjects_responese.json();
+};
 
 
 async function render_subject_schemas()
 {
     const user_subjects_response = await fetch(`/api/v1/users/${session_info.user_id}/subjects`, get_payload());
 
-    if (user_subjects_response.status == 403)
+    if (user_subjects_response.status == 401)
     {
         window.location.replace("/login");
     }
@@ -39,7 +32,7 @@ async function render_subject_schemas()
     {
         const empty_div = document.createElement("div");
         empty_div.className = "empty-state";
-        empty_div.textContent = "No schame saved yet."
+        empty_div.textContent = "No schema saved yet."
         container.appendChild(empty_div);
         return;
     }
@@ -104,8 +97,16 @@ async function render_subject_schemas()
     container.appendChild(table_wrapper);
 }
 
-function render_global_subjects_list()
+async function render_global_subjects_list()
 {
+    const global_subjects_responese = await fetch(`/api/v1/subjects`, get_payload());
+
+    if (global_subjects_responese.status == 401)
+    {
+        window.location.replace("/login");
+    }
+    const global_subjects: SubjectInfo[] = await global_subjects_responese.json();
+
     const selection = document.getElementById("subject_code") as HTMLSelectElement;
 
     global_subjects.forEach((subject: SubjectInfo) => 

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activities</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <h1 class="headline">Activities</h1>
+            <div class="link-row">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/activities">Activities</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="auth-layout">
+            <section class="panel">
+                <h2>Record Activity</h2>
+                <form id="add_activity">
+                    <label for="subject_code">Subject</label>
+                    <select name="subject_code" id="subject_code" required>
+                        <option value="">Select subject</option>
+                    </select>
+                    <label for="activity_name">Activity Name</label>
+                    <input id="activity_name" name="activity_name" type="text" required>
+    
+                    <label for="activity_type">Activity Type</label>
+                    <select name="activity_type" id="activity_type">
+                        <option value="Activity">Activity</option>
+                        <option value="Major Exam">Major Exam</option>
+                        <option value="Final Output">Final Output</option>
+                    </select>
+                    <div class="form-grid">
+                        <div>
+                            <label for="points">Points Scored</label>
+                            <input id="points" name="points"" type="number" min="0" value="0" required>
+                        </div>
+                        <div>
+                            <label for="max_points">Max Points</label>
+                            <input id="max_points" name="max_points" type="number" min="0" value="0" required>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="subject_submit" type="submit">Save schema</button>
+                </form>
+                <div id="result_div"></div>
+            </section>
+
+            <section class="panel">
+                <h2>Schema List</h2>
+                <div id="activities_table">
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script src="js/activities.js" type="module"></script>
+
+</body>
+</html>
