@@ -63,6 +63,8 @@ def get_user_subjects(user_id: int, db_connection: Connection = Depends(get_db),
     return db_connection.execute(query,query_parameters).mappings().all()
 
 
+
+
 @user_subjects_router.put("/{subject_code}")
 def update_user_subject(user_id: int, subject_code: str, payload: UserSubjectUpdateBody, db_connection: Connection = Depends(get_db), _ = Depends(verify_session_token)):
     try:
@@ -123,7 +125,7 @@ class GradeResponse(BaseModel):
     subject_code: str
     subject_name: str
     units: int
-    grade: Decimal = Field(max_digits=2,decimal_places=1)
+    grade: Decimal = Field(max_digits=3,decimal_places=2)
 
 def calculate_grade(points: int, max_points: int) -> Decimal:
     if points == 0:
@@ -187,3 +189,18 @@ def get_grades(user_id: int, db_connection: Connection = Depends(get_db), _ = De
 
     return response_data
 
+
+@user_subjects_router.get("/{subject_code}", response_model = SubjectResponse)
+def get_user_subject(user_id: int, subject_code: str, db_connection: Connection = Depends(get_db), _ = Depends(verify_session_token)):
+    query = text("""SELECT subjects.subject_code, subjects.subject_name, subjects.units, user_subjects.activity_split, user_subjects.major_exam_split, user_subjects.final_output_split
+                        FROM user_subjects
+                        LEFT JOIN subjects ON subjects.subject_code = user_subjects.subject_code
+                        WHERE user_subjects.user_id = :user_id AND user_subjects.subject_code = :subject_code""")
+    query_parameters = {"user_id": user_id, "subject_code": subject_code}
+    
+    result = db_connection.execute(query,query_parameters)
+    if (result.rowcount == 0):
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+                            msg = "Subject not found")
+
+    return result.first()

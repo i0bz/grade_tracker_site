@@ -63,3 +63,30 @@ export function post_payload(object: any)
         body: JSON.stringify(object)
     };
 }
+
+
+
+
+export function put_payload(object: any)
+{
+    const session = get_session_info();
+    if (!session.is_logged_in)
+    {
+        return {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(object)
+        };
+    }
+
+    return {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${session.session_token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(object)
+    };
+}

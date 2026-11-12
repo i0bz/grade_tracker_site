@@ -3,28 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activities</title>
+    <title>Edit</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
 </head>
 <body>
-    <div class="container">
+    <div class="container card-container">
         <div class="topbar">
-            <h1 class="headline">Activities</h1>
+            <img src="assets/logo.svg" alt="logo" width="100" height="50">
+            <h1 class="headline">Edit Subject</h1>
             <div class="link-row">
                 <a href="/dashboard">Dashboard</a>
-                <a href="/activities">Activities</a>
+                <a href="/subjects">Subjects</a>
                 <a href="/logout">Logout</a>
             </div>
         </div>
 
         <div class="auth-layout">
             <section class="panel">
+                <h2>Edit Subject Schema</h2>
+                <form id="edit_subject">
+                    <label for="activity_split">Activity (%)</label>
+                    <input id="activity_split" name="activity_split" type="number" min="0" max="100" value="30" required>
+    
+                    <label for="major_exam_split">Major Exam (%)</label>
+                    <input id="major_exam_split" name="major_exam_split" type="number" min="0" max="100" value="40" required>
+    
+                    <label for="final_output_split">Final Output (%)</label>
+                    <input id="final_output_split" name="final_output_split" type="number" min="0" max="100" value="30" required>
+    
+                    <button class="btn btn-primary" id="subject_submit" type="submit">Save schema</button>
+                </form>
+                <div id="subject_result_div"></div>
+            </section>
+            
+            <section class="panel">
                 <h2>Record Activity</h2>
                 <form id="add_activity">
-                    <label for="subject_code">Subject</label>
-                    <select name="subject_code" id="subject_code" required>
-                        <option value="">Select subject</option>
-                    </select>
                     <label for="activity_name">Activity Name</label>
                     <input id="activity_name" name="activity_name" type="text" required>
     
@@ -44,21 +59,22 @@
                             <input id="max_points" name="max_points" type="number" min="0" value="0" required>
                         </div>
                     </div>
-                    <button class="btn btn-primary" id="subject_submit" type="submit">Save schema</button>
+                    <button class="btn btn-primary" id="subject_submit" type="submit">Record Activity</button>
                 </form>
-                <div id="result_div"></div>
+                <div id="activity_result_div"></div>
             </section>
 
-            <section class="panel">
-                <h2>Schema List</h2>
-                <div id="activities_table">
-                </div>
-            </section>
         </div>
+
+        <section class="panel">
+            <h2>Activity List</h2>
+            <div id="activities_table">
+            </div>
+        </section>
 
     </div>
 
-    <script src="js/activities.js" type="module"></script>
+    <script src="js/edit.js" type="module"></script>
 
 </body>
 </html>

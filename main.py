@@ -9,6 +9,7 @@ app.include_router(router, prefix="/api/v1")
 
 app.mount("/js", StaticFiles(directory="frontend/dist/js"), name="js")
 app.mount("/css", StaticFiles(directory="frontend/dist/css"), name="css")
+app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="css")
 
 
 
@@ -40,6 +41,6 @@ async def logout_link():
 async def subjects_page():
     return FileResponse(os.path.join(html_path, "subjects.html"))
 
-@app.get("/activities")
-async def activities_page():
-    return FileResponse(os.path.join(html_path, "activities.html"))
+@app.get("/edit")
+async def subject_edit_page():
+    return FileResponse(os.path.join(html_path, "edit.html"))

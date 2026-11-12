@@ -43,6 +43,7 @@ async function render_subject_schemas()
     const header = document.createElement("thead");
     header.innerHTML = `
     <tr>
+        <th>Code</th>
         <th>Subject</th>
         <th>Act</th>
         <th>Major</th>
@@ -55,12 +56,14 @@ async function render_subject_schemas()
     user_subjects.forEach((schema: SubjectSchema) => 
     {
        const row = document.createElement('tr');
+       const code_col = document.createElement('td');
        const name_col = document.createElement('td');
        const act_col = document.createElement('td');
        const major_col = document.createElement('td');
        const final_col = document.createElement('td');
-       const delete_col = document.createElement('td');
+       const action_col = document.createElement('td');
        
+       code_col.textContent = schema.subject_code;
        name_col.textContent = schema.subject_name;
        act_col.textContent = `${Number(schema.activity_split).toFixed(2)}%`;
        major_col.textContent = `${Number(schema.major_exam_split).toFixed(2)}%`;
@@ -68,7 +71,7 @@ async function render_subject_schemas()
 
        const delete_btn = document.createElement("button");
        delete_btn.className = "btn btn-danger";
-       delete_btn.textContent = "Delete"
+       delete_btn.textContent = "Delete";
        delete_btn.addEventListener("click", async (event) =>
         {
             const confirmation = window.confirm("Delete this subject schema?");
@@ -80,13 +83,30 @@ async function render_subject_schemas()
             render_subject_schemas();
         });
 
-        delete_col.appendChild(delete_btn);
+       const edit_btn = document.createElement("button");
+       edit_btn.className = "btn";
+       edit_btn.textContent = "Edit";
+       edit_btn.addEventListener("click", async (event) =>
+        {
+            sessionStorage.setItem("subject_to_edit", schema.subject_code); 
+            window.location.replace("/edit");
+        });
+        
+        
+        const button_container = document.createElement("div");
+        button_container.style.gap = "4px";
+        button_container.style.display = "flex";
 
+        button_container.appendChild(edit_btn);
+        button_container.appendChild(delete_btn);
+        action_col.appendChild(button_container);
+
+        row.appendChild(code_col);
         row.appendChild(name_col);
         row.appendChild(act_col);
         row.appendChild(major_col);
         row.appendChild(final_col);
-        row.appendChild(delete_col);
+        row.appendChild(action_col);
 
         body.appendChild(row);
     });

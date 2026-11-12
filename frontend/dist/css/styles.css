@@ -35,6 +35,14 @@ body {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+.card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+
 h1, h2, h3 {
     margin-top: 0;
     color: var(--text-main);

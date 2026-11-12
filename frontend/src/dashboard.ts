@@ -29,10 +29,14 @@ function set_general_overview()
     grades_list.forEach(grade_info => {
         subject_count++;
         highest_grade = Math.min(highest_grade, grade_info.grade);
-        total_units += grade_info.units;
-        total_grade += grade_info.grade;
+        if (!(grade_info.grade < 1))
+        {
+            total_units += grade_info.units;
+            total_grade += (grade_info.grade * grade_info.units);
+        }
     });
 
+    if (total_grade === 0 && total_units === 0) total_units = 1;
     let average = total_grade / total_units;
 
     if (subject_count == 0)
